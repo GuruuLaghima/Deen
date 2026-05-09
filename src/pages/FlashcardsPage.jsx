@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { VOCABULARY, CATEGORIES } from '../data/vocabulary'
+import SpeakButton from '../components/SpeakButton'
 
 function shuffle(arr) {
   const a = [...arr]
@@ -23,7 +24,6 @@ export default function FlashcardsPage({ learnedWords, toggleWord }) {
   )
 
   const deck = isShuffled ? shuffledList : filtered
-
   const word = deck[index]
 
   function changeCategory(cat) {
@@ -33,19 +33,11 @@ export default function FlashcardsPage({ learnedWords, toggleWord }) {
     setIsShuffled(false)
   }
 
-  function prev() {
-    setIndex(i => (i - 1 + deck.length) % deck.length)
-    setFlipped(false)
-  }
-
-  function next() {
-    setIndex(i => (i + 1) % deck.length)
-    setFlipped(false)
-  }
+  function prev() { setIndex(i => (i - 1 + deck.length) % deck.length); setFlipped(false) }
+  function next() { setIndex(i => (i + 1) % deck.length); setFlipped(false) }
 
   function handleShuffle() {
-    const sl = shuffle(filtered)
-    setShuffledList(sl)
+    setShuffledList(shuffle(filtered))
     setIsShuffled(true)
     setIndex(0)
     setFlipped(false)
@@ -63,15 +55,9 @@ export default function FlashcardsPage({ learnedWords, toggleWord }) {
       </div>
 
       <div className="cat-scroll">
-        <button className={`cat-btn${category === 'all' ? ' active' : ''}`} onClick={() => changeCategory('all')}>
-          Tous
-        </button>
+        <button className={`cat-btn${category === 'all' ? ' active' : ''}`} onClick={() => changeCategory('all')}>Tous</button>
         {CATEGORIES.map(c => (
-          <button
-            key={c.id}
-            className={`cat-btn${category === c.id ? ' active' : ''}`}
-            onClick={() => changeCategory(c.id)}
-          >
+          <button key={c.id} className={`cat-btn${category === c.id ? ' active' : ''}`} onClick={() => changeCategory(c.id)}>
             {c.icon} {c.label}
           </button>
         ))}
@@ -86,6 +72,7 @@ export default function FlashcardsPage({ learnedWords, toggleWord }) {
       <div className={`flashcard${flipped ? ' flipped' : ''}`} onClick={() => setFlipped(f => !f)}>
         <div className="card-inner">
           <div className="card-front">
+            <SpeakButton text={word.arabic} className="card-speak" />
             <div className="card-arabic arabic">{word.arabic}</div>
             <div className="card-translit">{word.translit}</div>
             <div className="card-hint">Clique pour retourner</div>

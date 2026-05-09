@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { VOCABULARY, CATEGORIES } from '../data/vocabulary'
+import SpeakButton from '../components/SpeakButton'
 
 function shuffle(arr) {
   const a = [...arr]
@@ -11,11 +12,9 @@ function shuffle(arr) {
 }
 
 function buildQuestions(pool, mode, count = 10) {
-  const items = shuffle(pool).slice(0, count)
-  return items.map(item => {
+  return shuffle(pool).slice(0, count).map(item => {
     const distractors = shuffle(pool.filter(w => w.id !== item.id)).slice(0, 3)
-    const options = shuffle([item, ...distractors])
-    return { item, options, mode }
+    return { item, options: shuffle([item, ...distractors]), mode }
   })
 }
 
@@ -26,14 +25,12 @@ function QuizSetup({ onStart }) {
   function start() {
     const pool = category === 'all' ? VOCABULARY : VOCABULARY.filter(w => w.category === category)
     if (pool.length < 4) return
-    const questions = buildQuestions(pool, mode)
-    onStart(questions)
+    onStart(buildQuestions(pool, mode))
   }
 
   return (
     <div className="quiz-setup">
       <h2 className="section-title">Configurer le quiz</h2>
-
       <div className="setup-group">
         <label className="setup-label">Thème</label>
         <div className="cat-scroll">
@@ -45,25 +42,17 @@ function QuizSetup({ onStart }) {
           ))}
         </div>
       </div>
-
       <div className="setup-group">
         <label className="setup-label">Mode</label>
         <div className="mode-row">
-          <button
-            className={`mode-btn${mode === 'ar-fr' ? ' active' : ''}`}
-            onClick={() => setMode('ar-fr')}
-          >
+          <button className={`mode-btn${mode === 'ar-fr' ? ' active' : ''}`} onClick={() => setMode('ar-fr')}>
             <span className="arabic">عَرَبِي</span> → Français
           </button>
-          <button
-            className={`mode-btn${mode === 'fr-ar' ? ' active' : ''}`}
-            onClick={() => setMode('fr-ar')}
-          >
+          <button className={`mode-btn${mode === 'fr-ar' ? ' active' : ''}`} onClick={() => setMode('fr-ar')}>
             Français → <span className="arabic">عَرَبِي</span>
           </button>
         </div>
       </div>
-
       <button className="btn-start" onClick={start}>Commencer le quiz →</button>
     </div>
   )
@@ -72,31 +61,32 @@ function QuizSetup({ onStart }) {
 function QuizQuestion({ question, onAnswer, answered }) {
   const { item, options, mode } = question
 
-  const question_text = mode === 'ar-fr'
-    ? <><span className="q-arabic arabic">{item.arabic}</span><span className="q-translit">({item.translit})</span></>
-    : <span className="q-french">{item.french}</span>
-
   return (
     <div className="quiz-question">
       <div className="q-prompt">Que signifie…</div>
-      <div className="q-word">{question_text}</div>
+      <div className="q-word">
+        {mode === 'ar-fr' ? (
+          <>
+            <span className="q-arabic arabic">{item.arabic}</span>
+            <span className="q-translit">({item.translit})</span>
+            <SpeakButton text={item.arabic} rate={0.7} className="speak-quiz" />
+          </>
+        ) : (
+          <span className="q-french">{item.french}</span>
+        )}
+      </div>
       <div className="q-options">
         {options.map(opt => {
           let cls = 'q-option'
           if (answered) {
             if (opt.id === item.id) cls += ' correct'
-            else if (opt.id === answered && opt.id !== item.id) cls += ' wrong'
+            else if (opt.id === answered) cls += ' wrong'
           }
           return (
-            <button
-              key={opt.id}
-              className={cls}
-              onClick={() => !answered && onAnswer(opt.id)}
-              disabled={!!answered}
-            >
+            <button key={opt.id} className={cls} onClick={() => !answered && onAnswer(opt.id)} disabled={!!answered}>
               {mode === 'ar-fr'
                 ? opt.french
-                : <><span className="arabic">{opt.arabic}</span> <span className="opt-translit">({opt.translit})</span></>}
+                : <><span className="arabic">{opt.arabic}</span><span className="opt-translit"> ({opt.translit})</span></>}
             </button>
           )
         })}
@@ -105,20 +95,17 @@ function QuizQuestion({ question, onAnswer, answered }) {
   )
 }
 
-function QuizResult({ score, total, onRestart, onHome }) {
+function QuizResult({ score, total, onRestart }) {
   const pct = Math.round((score / total) * 100)
   const emoji = pct >= 80 ? '🌟' : pct >= 60 ? '👍' : '💪'
-  const msg = pct >= 80 ? 'Excellent !' : pct >= 60 ? 'Bon travail !' : 'Continue à pratiquer !'
-
   return (
     <div className="quiz-result">
       <div className="result-emoji">{emoji}</div>
       <div className="result-score">{score} / {total}</div>
       <div className="result-pct">{pct}%</div>
-      <div className="result-msg">{msg}</div>
+      <div className="result-msg">{pct >= 80 ? 'Excellent !' : pct >= 60 ? 'Bon travail !' : 'Continue à pratiquer !'}</div>
       <div className="result-btns">
         <button className="btn-start" onClick={onRestart}>Rejouer</button>
-        <button className="btn-outline" onClick={onHome}>Menu</button>
       </div>
     </div>
   )
@@ -131,51 +118,30 @@ export default function QuizPage({ saveQuizScore }) {
   const [score, setScore] = useState(0)
   const [done, setDone] = useState(false)
 
-  function start(qs) {
-    setQuestions(qs)
-    setQi(0)
-    setAnswered(null)
-    setScore(0)
-    setDone(false)
-  }
+  function start(qs) { setQuestions(qs); setQi(0); setAnswered(null); setScore(0); setDone(false) }
 
   function answer(optId) {
     setAnswered(optId)
     const correct = optId === questions[qi].item.id
-    if (correct) setScore(s => s + 1)
+    const newScore = correct ? score + 1 : score
+    if (correct) setScore(newScore)
     setTimeout(() => {
-      if (qi + 1 >= questions.length) {
-        const finalScore = correct ? score + 1 : score
-        saveQuizScore(finalScore, questions.length, 'mixed')
-        setDone(true)
-      } else {
-        setQi(i => i + 1)
-        setAnswered(null)
-      }
+      if (qi + 1 >= questions.length) { saveQuizScore(newScore, questions.length, 'mixed'); setDone(true) }
+      else { setQi(i => i + 1); setAnswered(null) }
     }, 1100)
-  }
-
-  function restart() {
-    setQuestions(null)
-    setDone(false)
   }
 
   if (!questions) return (
     <div className="page">
-      <div className="page-header">
-        <h1 className="page-title">Quiz</h1>
-        <p className="page-sub">Teste tes connaissances</p>
-      </div>
+      <div className="page-header"><h1 className="page-title">Quiz</h1><p className="page-sub">Teste tes connaissances</p></div>
       <QuizSetup onStart={start} />
     </div>
   )
 
   if (done) return (
     <div className="page">
-      <div className="page-header">
-        <h1 className="page-title">Quiz</h1>
-      </div>
-      <QuizResult score={score} total={questions.length} onRestart={restart} onHome={restart} />
+      <div className="page-header"><h1 className="page-title">Quiz</h1></div>
+      <QuizResult score={score} total={questions.length} onRestart={() => setQuestions(null)} />
     </div>
   )
 
@@ -184,9 +150,7 @@ export default function QuizPage({ saveQuizScore }) {
       <div className="page-header">
         <h1 className="page-title">Quiz</h1>
         <div className="quiz-progress-row">
-          <div className="quiz-progress-bar">
-            <div style={{ width: `${((qi) / questions.length) * 100}%` }} />
-          </div>
+          <div className="quiz-progress-bar"><div style={{ width: `${(qi / questions.length) * 100}%` }} /></div>
           <span className="quiz-counter">{qi + 1} / {questions.length}</span>
         </div>
       </div>

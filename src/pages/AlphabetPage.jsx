@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { ALPHABET } from '../data/alphabet'
 import WritingCanvas from '../components/WritingCanvas'
+import SpeakButton from '../components/SpeakButton'
 
 export default function AlphabetPage({ learnedLetters, toggleLetter }) {
   const [selected, setSelected] = useState(null)
-
   const letter = ALPHABET.find(l => l.id === selected)
 
   return (
@@ -32,7 +32,10 @@ export default function AlphabetPage({ learnedLetters, toggleLetter }) {
       {letter && (
         <div className="letter-detail">
           <div className="letter-detail-top">
-            <div className="detail-letter arabic">{letter.letter}</div>
+            <div className="detail-left">
+              <div className="detail-letter arabic">{letter.letter}</div>
+              <SpeakButton text={letter.name} rate={0.6} className="speak-letter" />
+            </div>
             <div className="detail-info">
               <div className="detail-name">
                 <span className="arabic">{letter.name}</span>
@@ -47,11 +50,10 @@ export default function AlphabetPage({ learnedLetters, toggleLetter }) {
                 <span className="arabic ex-word">{letter.example.word}</span>
                 <span className="ex-translit"> ({letter.example.translit})</span>
                 <span className="ex-meaning"> = {letter.example.meaning}</span>
+                <SpeakButton text={letter.example.word} rate={0.65} className="speak-example" />
               </div>
               <div className="detail-connects">
-                {letter.connects
-                  ? '✓ Se lie des deux côtés'
-                  : '⚠ Ne se lie pas à gauche'}
+                {letter.connects ? '✓ Se lie des deux côtés' : '⚠ Ne se lie pas à gauche'}
               </div>
               <button
                 className={`btn-learn${learnedLetters.has(letter.id) ? ' learned' : ''}`}
