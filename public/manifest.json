@@ -1,0 +1,19 @@
+{
+  "name": "دَيْن — Arabe littéraire",
+  "short_name": "دَيْن",
+  "description": "Application d'apprentissage de l'arabe littéraire al-fuṣḥā",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F7F5F0",
+  "theme_color": "#2D6A4F",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%232D6A4F'/><text x='96' y='140' font-size='120' text-anchor='middle' fill='white' font-family='serif'>د</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

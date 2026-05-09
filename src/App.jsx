@@ -13,18 +13,18 @@ export default function App() {
   const progress = useProgress()
 
   const pages = {
-    home: <Home setPage={setPage} learnedWords={progress.learnedWords} learnedLetters={progress.learnedLetters} readLessons={progress.readLessons} quizHistory={progress.quizHistory} streak={progress.streak} />,
-    alphabet: <AlphabetPage learnedLetters={progress.learnedLetters} toggleLetter={progress.toggleLetter} />,
+    home:       <Home       setPage={setPage} learnedWords={progress.learnedWords} learnedLetters={progress.learnedLetters} readLessons={progress.readLessons} quizHistory={progress.quizHistory} streak={progress.streak} />,
+    alphabet:   <AlphabetPage   learnedLetters={progress.learnedLetters} toggleLetter={progress.toggleLetter} />,
     flashcards: <FlashcardsPage learnedWords={progress.learnedWords} toggleWord={progress.toggleWord} />,
-    quiz: <QuizPage saveQuizScore={progress.saveQuizScore} />,
-    grammar: <GrammarPage readLessons={progress.readLessons} markLessonRead={progress.markLessonRead} />,
-    progress: <ProgressPage learnedWords={progress.learnedWords} learnedLetters={progress.learnedLetters} readLessons={progress.readLessons} quizHistory={progress.quizHistory} streak={progress.streak} />,
+    quiz:       <QuizPage       saveQuizScore={progress.saveQuizScore} />,
+    grammar:    <GrammarPage    readLessons={progress.readLessons} markLessonRead={progress.markLessonRead} />,
+    progress:   <ProgressPage   learnedWords={progress.learnedWords} learnedLetters={progress.learnedLetters} readLessons={progress.readLessons} quizHistory={progress.quizHistory} streak={progress.streak} />,
   }
 
   return (
     <div className="app">
-      <main className="main">{pages[page]}</main>
       <Navbar page={page} setPage={setPage} />
+      <main className="main">{pages[page]}</main>
     </div>
   )
 }

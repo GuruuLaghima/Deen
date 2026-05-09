@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ALPHABET } from '../data/alphabet'
+import WritingCanvas from '../components/WritingCanvas'
 
 export default function AlphabetPage({ learnedLetters, toggleLetter }) {
   const [selected, setSelected] = useState(null)
@@ -30,38 +31,44 @@ export default function AlphabetPage({ learnedLetters, toggleLetter }) {
 
       {letter && (
         <div className="letter-detail">
-          <div className="detail-letter arabic">{letter.letter}</div>
-          <div className="detail-name">
-            <span className="arabic">{letter.name}</span>
-            <span className="detail-translit"> — {letter.nameTranslit}</span>
+          <div className="letter-detail-top">
+            <div className="detail-letter arabic">{letter.letter}</div>
+            <div className="detail-info">
+              <div className="detail-name">
+                <span className="arabic">{letter.name}</span>
+                <span className="detail-translit"> — {letter.nameTranslit}</span>
+              </div>
+              <div className="detail-sound">
+                <span className="label">Son :</span> <strong>{letter.sound}</strong>
+              </div>
+              <p className="detail-pronun">{letter.pronunciation}</p>
+              <div className="detail-example">
+                <span className="label">Exemple : </span>
+                <span className="arabic ex-word">{letter.example.word}</span>
+                <span className="ex-translit"> ({letter.example.translit})</span>
+                <span className="ex-meaning"> = {letter.example.meaning}</span>
+              </div>
+              <div className="detail-connects">
+                {letter.connects
+                  ? '✓ Se lie des deux côtés'
+                  : '⚠ Ne se lie pas à gauche'}
+              </div>
+              <button
+                className={`btn-learn${learnedLetters.has(letter.id) ? ' learned' : ''}`}
+                onClick={() => toggleLetter(letter.id)}
+              >
+                {learnedLetters.has(letter.id) ? '✓ Maîtrisée' : 'Marquer comme maîtrisée'}
+              </button>
+            </div>
           </div>
-          <div className="detail-sound">
-            <span className="label">Son :</span> <strong>{letter.sound}</strong>
-          </div>
-          <p className="detail-pronun">{letter.pronunciation}</p>
-          <div className="detail-example">
-            <span className="label">Exemple :</span>
-            <span className="arabic ex-word"> {letter.example.word}</span>
-            <span className="ex-translit"> ({letter.example.translit})</span>
-            <span className="ex-meaning"> = {letter.example.meaning}</span>
-          </div>
-          <div className="detail-connects">
-            {letter.connects
-              ? '✓ Se lie des deux côtés'
-              : '⚠ Ne se lie pas à gauche (brise la cursive)'}
-          </div>
-          <button
-            className={`btn-learn${learnedLetters.has(letter.id) ? ' learned' : ''}`}
-            onClick={() => toggleLetter(letter.id)}
-          >
-            {learnedLetters.has(letter.id) ? '✓ Maîtrisée' : 'Marquer comme maîtrisée'}
-          </button>
+
+          <WritingCanvas letter={letter.letter} />
         </div>
       )}
 
       {!selected && (
         <div className="alpha-hint">
-          <p>Clique sur une lettre pour voir sa prononciation et un exemple.</p>
+          <p>Clique sur une lettre pour voir sa prononciation et t'entraîner à l'écrire.</p>
         </div>
       )}
     </div>
