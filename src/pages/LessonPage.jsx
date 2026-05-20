@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { MADINAH_BOOK1 } from '../data/madinah'
 import SpeakButton from '../components/SpeakButton'
+import WritingCanvas from '../components/WritingCanvas'
 
 const hasArabic = (str) => /[؀-ۿ]/.test(str)
 
@@ -43,10 +44,12 @@ function ExerciseCard({ ex, done, onAnswer }) {
 
 export default function LessonPage({ lessonId, lessonProgress, saveExerciseDone, setPage }) {
   const [tab, setTab] = useState('vocab')
+  const [selectedVocabIdx, setSelectedVocabIdx] = useState(null)
   const lesson = MADINAH_BOOK1.lessons.find(l => l.id === lessonId)
 
   useEffect(() => {
     setTab('vocab')
+    setSelectedVocabIdx(null)
   }, [lessonId])
 
   if (!lesson) return null
@@ -54,6 +57,8 @@ export default function LessonPage({ lessonId, lessonProgress, saveExerciseDone,
   const done = lessonProgress[lesson.id] || new Set()
   const exTotal = lesson.exercises.length
   const exDone = done.size
+
+  const activeWord = selectedVocabIdx !== null ? lesson.vocabulary[selectedVocabIdx] : null
 
   return (
     <div className="page">
@@ -80,19 +85,44 @@ export default function LessonPage({ lessonId, lessonProgress, saveExerciseDone,
       </div>
 
       {tab === 'vocab' && (
-        <div className="lp-vocab-grid">
-          {lesson.vocabulary.map((w, i) => (
-            <div key={i} className="lp-vocab-card">
-              <div className="lp-vocab-top">
-                <span className="lp-vocab-ar arabic">{w.ar}</span>
-                <SpeakButton text={w.ar} rate={0.7} className="speak-vocab" />
-              </div>
-              <div className="lp-vocab-translit">{w.translit}</div>
-              <div className="lp-vocab-fr">{w.fr}</div>
-              <span className={`lp-vocab-gender ${w.gender}`}>{w.gender === 'm' ? 'masc.' : 'fém.'}</span>
+        <>
+          <div className="lp-vocab-grid">
+            {lesson.vocabulary.map((w, i) => (
+              <button
+                key={i}
+                className={`lp-vocab-card${selectedVocabIdx === i ? ' selected' : ''}`}
+                onClick={() => setSelectedVocabIdx(selectedVocabIdx === i ? null : i)}
+              >
+                <div className="lp-vocab-top">
+                  <span className="lp-vocab-ar arabic">{w.ar}</span>
+                  <SpeakButton text={w.ar} rate={0.7} className="speak-vocab" />
+                </div>
+                <div className="lp-vocab-translit">{w.translit}</div>
+                <div className="lp-vocab-fr">{w.fr}</div>
+                <div className="lp-vocab-bottom">
+                  <span className={`lp-vocab-gender ${w.gender}`}>{w.gender === 'm' ? 'masc.' : 'fém.'}</span>
+                  <span className="lp-vocab-write-icon">✎</span>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Writing canvas — stays mounted to preserve drawing across word switches */}
+          <div style={{ display: activeWord ? 'block' : 'none' }}>
+            <div className="lp-writing-caption">
+              {activeWord && <>
+                <span className="arabic lp-writing-ar">{activeWord.ar}</span>
+                <span className="lp-writing-translit">{activeWord?.translit}</span>
+                <span className="lp-writing-fr">— {activeWord?.fr}</span>
+              </>}
             </div>
-          ))}
-        </div>
+            <WritingCanvas text={activeWord?.ar ?? ''} />
+          </div>
+
+          {!activeWord && (
+            <p className="lp-write-hint">Appuie sur un mot pour pratiquer l'écriture ✎</p>
+          )}
+        </>
       )}
 
       {tab === 'grammar' && (

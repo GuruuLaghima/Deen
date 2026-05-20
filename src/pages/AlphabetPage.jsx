@@ -64,7 +64,7 @@ export default function AlphabetPage({ learnedLetters, toggleLetter }) {
             </div>
           </div>
 
-          <WritingCanvas letter={letter.letter} />
+          <WritingCanvas text={letter.letter} />
         </div>
       )}
 
