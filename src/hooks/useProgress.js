@@ -6,6 +6,7 @@ const LS_KEYS = {
   lessons: 'deen_read_lessons',
   quizHistory: 'deen_quiz_history',
   streak: 'deen_streak',
+  lessonProgress: 'deen_lesson_progress',
 }
 
 function readSet(key) {
@@ -50,6 +51,15 @@ export function useProgress() {
       return []
     }
   })
+  const [lessonProgress, setLessonProgress] = useState(() => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(LS_KEYS.lessonProgress) || '{}')
+      const result = {}
+      for (const [k, v] of Object.entries(raw)) result[k] = new Set(v)
+      return result
+    } catch { return {} }
+  })
+
   const [streak, setStreak] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(LS_KEYS.streak) || '{"count":0,"lastDate":""}')
@@ -88,6 +98,20 @@ export function useProgress() {
     setStreak(updateStreak())
   }, [])
 
+  const saveExerciseDone = useCallback((lessonId, exerciseId) => {
+    setLessonProgress(prev => {
+      const key = String(lessonId)
+      const set = new Set(prev[key] || [])
+      set.add(exerciseId)
+      const next = { ...prev, [key]: set }
+      const toStore = {}
+      for (const [k, v] of Object.entries(next)) toStore[k] = [...v]
+      localStorage.setItem(LS_KEYS.lessonProgress, JSON.stringify(toStore))
+      return next
+    })
+    setStreak(updateStreak())
+  }, [])
+
   const saveQuizScore = useCallback((score, total, category) => {
     const entry = { date: today(), score, total, category }
     setQuizHistory(prev => {
@@ -98,5 +122,5 @@ export function useProgress() {
     setStreak(updateStreak())
   }, [])
 
-  return { learnedWords, learnedLetters, readLessons, quizHistory, streak, toggleWord, toggleLetter, markLessonRead, saveQuizScore }
+  return { learnedWords, learnedLetters, readLessons, lessonProgress, quizHistory, streak, toggleWord, toggleLetter, markLessonRead, saveExerciseDone, saveQuizScore }
 }

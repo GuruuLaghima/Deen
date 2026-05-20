@@ -4,7 +4,7 @@ export default function Navbar({ page, setPage }) {
     { id: 'alphabet',   label: 'Alphabet',  icon: 'أ',  arabic: true },
     { id: 'flashcards', label: 'Mots',      icon: '⧉' },
     { id: 'quiz',       label: 'Quiz',      icon: '✎' },
-    { id: 'grammar',    label: 'Grammaire', icon: '☷' },
+    { id: 'cours',      label: 'Cours',     icon: '☷' },
     { id: 'progress',   label: 'Progrès',   icon: '◎' },
   ]
 

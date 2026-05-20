@@ -845,3 +845,276 @@ p { line-height: 1.6; }
   .card-arabic { font-size: 34px; }
   .detail-letter { font-size: 60px; }
 }
+
+/* ─── Cours page ─────────────────────────────────────────────── */
+.cours-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px 24px;
+}
+
+.cours-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.1s, border-color 0.15s;
+}
+.cours-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.cours-card.completed { border-color: var(--green-light); background: #f0fdf4; }
+
+.cours-num {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--gold-light);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.88rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cours-card.completed .cours-num { background: var(--green); color: white; }
+
+.cours-info { flex: 1; min-width: 0; }
+.cours-ar { font-size: 1.1rem; color: var(--text); margin-bottom: 2px; }
+.cours-subtitle { font-size: 0.78rem; color: var(--text2); margin-bottom: 1px; }
+.cours-concept { font-size: 0.72rem; color: var(--text3); font-style: italic; }
+
+.cours-bar {
+  height: 3px; background: var(--border); border-radius: 2px;
+  margin-top: 6px; overflow: hidden;
+}
+.cours-bar div { height: 100%; background: var(--green-light); border-radius: 2px; transition: width 0.3s; }
+
+.cours-badge { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+.cours-check { color: var(--green); font-size: 1rem; font-weight: 700; }
+.cours-pct { font-size: 0.68rem; color: var(--green); font-weight: 600; }
+.cours-arrow { font-size: 1.3rem; color: var(--text3); line-height: 1; }
+
+/* ─── Lesson page ─────────────────────────────────────────────── */
+.lp-header {
+  background: var(--green);
+  color: white;
+  padding: 16px 20px 18px;
+  border-radius: 0 0 20px 20px;
+  margin-bottom: 0;
+}
+
+.lp-back {
+  background: rgba(255,255,255,0.18);
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.lp-back:hover { background: rgba(255,255,255,0.3); }
+
+.lp-title-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+.lp-num { font-size: 0.72rem; opacity: 0.75; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; flex-shrink: 0; }
+.lp-ar-title { font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+.lp-subtitle { font-size: 0.85rem; opacity: 0.85; margin-bottom: 2px; }
+.lp-concept { font-size: 0.78rem; opacity: 0.7; font-style: italic; }
+
+/* Tabs */
+.lp-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--border);
+  padding: 0 16px;
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.lp-tab {
+  flex: 1;
+  padding: 12px 6px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text3);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.lp-tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+.lp-ex-badge {
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+/* Vocab tab */
+.lp-vocab-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 16px;
+}
+
+@media (min-width: 640px) {
+  .lp-vocab-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.lp-vocab-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 10px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 3px;
+  text-align: center;
+}
+
+.lp-vocab-top { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 2px; }
+.lp-vocab-ar { font-size: 1.3rem; color: var(--text); line-height: 1.4; }
+.lp-vocab-translit { font-size: 0.72rem; color: var(--text3); font-style: italic; }
+.lp-vocab-fr { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+
+.lp-vocab-gender {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em;
+  padding: 2px 7px; border-radius: 10px; margin-top: 2px;
+}
+.lp-vocab-gender.m { background: #dbeafe; color: #1e40af; }
+.lp-vocab-gender.f { background: #fce7f3; color: #9d174d; }
+
+/* Speak buttons inside lesson */
+.speak-btn.speak-vocab, .speak-btn.speak-ex {
+  background: var(--green-bg); color: var(--green);
+  width: 28px; height: 28px; font-size: 13px;
+}
+.speak-btn.speak-vocab:hover, .speak-btn.speak-ex:hover { background: var(--green); color: white; }
+
+/* Grammar tab */
+.lp-gram-panel { padding: 16px; }
+
+.lp-gram-rule-box {
+  background: var(--gold-light);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  font-size: 1rem;
+  text-align: center;
+  unicode-bidi: plaintext;
+  font-weight: 600;
+}
+
+.lp-gram-explanation {
+  color: var(--text2);
+  font-size: 0.9rem;
+  line-height: 1.75;
+  margin-bottom: 20px;
+  white-space: pre-line;
+}
+.lp-gram-explanation p { margin-bottom: 10px; }
+
+.lp-gram-heading {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+
+.lp-gram-examples { display: flex; flex-direction: column; gap: 10px; }
+
+.lp-gram-ex {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 4px;
+  position: relative;
+}
+.lp-gram-ex .speak-btn { position: absolute; top: 10px; right: 10px; }
+
+.lp-gram-ex-ar { font-size: 1.2rem; color: var(--text); padding-right: 40px; }
+.lp-gram-ex-fr { font-size: 0.85rem; color: var(--text2); }
+
+/* Exercises tab */
+.lp-exercises { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+
+.lp-all-done {
+  background: var(--green-bg);
+  border: 1.5px solid var(--green-light);
+  border-radius: var(--radius);
+  padding: 14px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--green);
+  font-size: 1rem;
+}
+
+.lp-ex-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.lp-ex-card.ex-done { border-color: var(--green-light); }
+
+.lp-ex-tick {
+  position: absolute; top: 12px; right: 14px;
+  color: var(--green); font-size: 0.88rem; font-weight: 700;
+}
+
+.lp-ex-q {
+  font-size: 0.95rem; font-weight: 600; color: var(--text);
+  margin-bottom: 12px; unicode-bidi: plaintext; line-height: 1.5;
+}
+
+.arabic-inline { font-family: 'Amiri', serif; }
+
+.lp-ex-opts { display: flex; flex-direction: column; gap: 8px; }
+.lp-ex-opts.binary { flex-direction: row; }
+.lp-ex-opts.binary .lp-ex-opt { flex: 1; justify-content: center; text-align: center; }
+
+.lp-ex-opt {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  font-size: 0.9rem; color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: inherit;
+  display: flex; align-items: center;
+}
+.lp-ex-opt.arabic { direction: rtl; justify-content: flex-end; font-family: 'Amiri', serif; font-size: 1rem; }
+.lp-ex-opt:not(:disabled):hover { border-color: var(--green); background: var(--green-bg); }
+.lp-ex-opt.correct { border-color: var(--green); background: var(--green-bg); color: var(--green); font-weight: 700; }
+.lp-ex-opt.wrong { border-color: var(--red); background: #fef2f2; color: var(--red); }
+
+.lp-ex-blank {
+  margin-top: 10px;
+  font-size: 1.1rem;
+  color: var(--green);
+  text-align: center;
+  font-weight: 600;
+  padding: 8px;
+  background: var(--green-bg);
+  border-radius: var(--radius-sm);
+}

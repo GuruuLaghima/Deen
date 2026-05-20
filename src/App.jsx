@@ -4,27 +4,37 @@ import Home from './pages/Home'
 import AlphabetPage from './pages/AlphabetPage'
 import FlashcardsPage from './pages/FlashcardsPage'
 import QuizPage from './pages/QuizPage'
-import GrammarPage from './pages/GrammarPage'
+import CoursPage from './pages/CoursPage'
+import LessonPage from './pages/LessonPage'
 import ProgressPage from './pages/ProgressPage'
 import { useProgress } from './hooks/useProgress'
 
 export default function App() {
   const [page, setPage] = useState('home')
+  const [selectedLesson, setSelectedLesson] = useState(null)
   const progress = useProgress()
+
+  function openLesson(lessonId) {
+    setSelectedLesson(lessonId)
+    setPage('lesson')
+  }
 
   const pages = {
     home:       <Home       setPage={setPage} learnedWords={progress.learnedWords} learnedLetters={progress.learnedLetters} readLessons={progress.readLessons} quizHistory={progress.quizHistory} streak={progress.streak} />,
     alphabet:   <AlphabetPage   learnedLetters={progress.learnedLetters} toggleLetter={progress.toggleLetter} />,
     flashcards: <FlashcardsPage learnedWords={progress.learnedWords} toggleWord={progress.toggleWord} />,
     quiz:       <QuizPage       saveQuizScore={progress.saveQuizScore} />,
-    grammar:    <GrammarPage    readLessons={progress.readLessons} markLessonRead={progress.markLessonRead} />,
+    cours:      <CoursPage      lessonProgress={progress.lessonProgress} openLesson={openLesson} />,
+    lesson:     <LessonPage     lessonId={selectedLesson} lessonProgress={progress.lessonProgress} saveExerciseDone={progress.saveExerciseDone} setPage={setPage} />,
     progress:   <ProgressPage   learnedWords={progress.learnedWords} learnedLetters={progress.learnedLetters} readLessons={progress.readLessons} quizHistory={progress.quizHistory} streak={progress.streak} />,
   }
 
+  const navPage = page === 'lesson' ? 'cours' : page
+
   return (
     <div className="app">
-      <Navbar page={page} setPage={setPage} />
-      <main className="main">{pages[page]}</main>
+      <Navbar page={navPage} setPage={setPage} />
+      <main className="main">{pages[page] ?? pages.home}</main>
     </div>
   )
 }
