@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ALPHABET } from '../data/alphabet'
 import WritingCanvas from '../components/WritingCanvas'
 import SpeakButton from '../components/SpeakButton'
@@ -6,6 +6,24 @@ import SpeakButton from '../components/SpeakButton'
 export default function AlphabetPage({ learnedLetters, toggleLetter }) {
   const [selected, setSelected] = useState(null)
   const letter = ALPHABET.find(l => l.id === selected)
+  const canvasRef = useRef(null)
+  const drawings = useRef({}) // { letterId: ImageData }
+
+  function selectLetter(id) {
+    // Save drawing of current letter before switching
+    if (selected && canvasRef.current) {
+      const data = canvasRef.current.getImageData()
+      if (data) drawings.current[selected] = data
+    }
+    setSelected(prev => prev === id ? null : id)
+  }
+
+  // After letter changes, restore its saved drawing (child effects run first so canvas is ready)
+  useEffect(() => {
+    if (!selected || !canvasRef.current) return
+    const saved = drawings.current[selected]
+    if (saved) canvasRef.current.setImageData(saved)
+  }, [selected])
 
   return (
     <div className="page">
@@ -20,7 +38,7 @@ export default function AlphabetPage({ learnedLetters, toggleLetter }) {
           <button
             key={l.id}
             className={`alpha-cell${selected === l.id ? ' selected' : ''}${learnedLetters.has(l.id) ? ' learned' : ''}`}
-            onClick={() => setSelected(selected === l.id ? null : l.id)}
+            onClick={() => selectLetter(l.id)}
           >
             <span className="alpha-letter arabic">{l.letter}</span>
             <span className="alpha-translit">{l.nameTranslit}</span>
@@ -64,7 +82,9 @@ export default function AlphabetPage({ learnedLetters, toggleLetter }) {
             </div>
           </div>
 
-          <WritingCanvas key={letter.id} text={letter.letter} />
+          {/* key={letter.id} remounts canvas for each letter → initCanvas draws fresh background,
+              then parent useEffect restores the saved drawing for this letter */}
+          <WritingCanvas ref={canvasRef} key={letter.id} text={letter.letter} />
         </div>
       )}
 

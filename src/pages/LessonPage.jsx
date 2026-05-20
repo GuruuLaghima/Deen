@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { MADINAH_BOOK1 } from '../data/madinah'
 import SpeakButton from '../components/SpeakButton'
 import WritingCanvas from '../components/WritingCanvas'
@@ -45,20 +45,45 @@ function ExerciseCard({ ex, done, onAnswer }) {
 export default function LessonPage({ lessonId, lessonProgress, saveExerciseDone, setPage }) {
   const [tab, setTab] = useState('vocab')
   const [selectedVocabIdx, setSelectedVocabIdx] = useState(null)
+  const canvasRef = useRef(null)
+  const drawings = useRef({}) // { vocabIndex: ImageData }
+
   const lesson = MADINAH_BOOK1.lessons.find(l => l.id === lessonId)
 
+  // Reset everything when lesson changes
   useEffect(() => {
     setTab('vocab')
     setSelectedVocabIdx(null)
+    drawings.current = {}
   }, [lessonId])
+
+  // After word selection changes, restore saved drawing (or clear for a new word)
+  useEffect(() => {
+    if (!canvasRef.current) return
+    if (selectedVocabIdx === null) return
+    const saved = drawings.current[selectedVocabIdx]
+    if (saved) {
+      canvasRef.current.setImageData(saved)
+    } else {
+      canvasRef.current.clearCanvas()
+    }
+  }, [selectedVocabIdx])
 
   if (!lesson) return null
 
   const done = lessonProgress[lesson.id] || new Set()
   const exTotal = lesson.exercises.length
   const exDone = done.size
-
   const activeWord = selectedVocabIdx !== null ? lesson.vocabulary[selectedVocabIdx] : null
+
+  function selectVocab(i) {
+    // Save current drawing before switching words
+    if (selectedVocabIdx !== null && canvasRef.current) {
+      const data = canvasRef.current.getImageData()
+      if (data) drawings.current[selectedVocabIdx] = data
+    }
+    setSelectedVocabIdx(prev => prev === i ? null : i)
+  }
 
   return (
     <div className="page">
@@ -91,7 +116,7 @@ export default function LessonPage({ lessonId, lessonProgress, saveExerciseDone,
               <button
                 key={i}
                 className={`lp-vocab-card${selectedVocabIdx === i ? ' selected' : ''}`}
-                onClick={() => setSelectedVocabIdx(selectedVocabIdx === i ? null : i)}
+                onClick={() => selectVocab(i)}
               >
                 <div className="lp-vocab-top">
                   <span className="lp-vocab-ar arabic">{w.ar}</span>
@@ -107,7 +132,7 @@ export default function LessonPage({ lessonId, lessonProgress, saveExerciseDone,
             ))}
           </div>
 
-          {/* Writing canvas — always in DOM so offsetWidth/offsetHeight work on init */}
+          {/* Canvas stays mounted (height:0 when hidden) so offsetWidth/Height remain valid */}
           <div className={`lp-writing-outer${activeWord ? '' : ' lp-writing-hidden'}`}>
             <div className="lp-writing-caption">
               <span className="arabic lp-writing-ar">{activeWord?.ar ?? ''}</span>
@@ -116,7 +141,7 @@ export default function LessonPage({ lessonId, lessonProgress, saveExerciseDone,
                 <span className="lp-writing-fr">— {activeWord.fr}</span>
               </>}
             </div>
-            <WritingCanvas text={activeWord?.ar ?? ''} />
+            <WritingCanvas ref={canvasRef} text={activeWord?.ar ?? ''} />
           </div>
 
           {!activeWord && (

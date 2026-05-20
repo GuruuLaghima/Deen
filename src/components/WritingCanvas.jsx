@@ -1,12 +1,11 @@
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react'
 
 const INK = '#1A1A1A'
-const CELL = 20  // quadrillé — 20px squares
+const CELL = 20
 
 function drawBackground(ctx, w, h) {
   ctx.fillStyle = '#FAFAF6'
   ctx.fillRect(0, 0, w, h)
-
   for (let x = 0; x <= w; x += CELL) {
     const major = Math.round(x / CELL) % 5 === 0
     ctx.strokeStyle = major ? '#C4BDB1' : '#DDD6CC'
@@ -19,13 +18,12 @@ function drawBackground(ctx, w, h) {
     ctx.lineWidth = major ? 0.8 : 0.5
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke()
   }
-
   ctx.strokeStyle = '#C4BDB1'
   ctx.lineWidth = 1
   ctx.strokeRect(0.5, 0.5, w - 1, h - 1)
 }
 
-export default function WritingCanvas({ text }) {
+const WritingCanvas = forwardRef(function WritingCanvas({ text }, ref) {
   const wrapRef = useRef(null)
   const canvasRef = useRef(null)
   const drawing = useRef(false)
@@ -52,13 +50,25 @@ export default function WritingCanvas({ text }) {
     const canvas = canvasRef.current
     if (!canvas) return
     const dpr = window.devicePixelRatio || 1
-    const w = canvas.width / dpr
-    const h = canvas.height / dpr
-    drawBackground(canvas.getContext('2d'), w, h)
+    drawBackground(canvas.getContext('2d'), canvas.width / dpr, canvas.height / dpr)
   }, [])
 
+  // Expose save/restore so parent pages can persist drawings per letter/word
+  useImperativeHandle(ref, () => ({
+    getImageData() {
+      const canvas = canvasRef.current
+      if (!canvas) return null
+      return canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height)
+    },
+    setImageData(data) {
+      const canvas = canvasRef.current
+      if (!data || !canvas) return
+      canvas.getContext('2d').putImageData(data, 0, 0)
+    },
+    clearCanvas: clear,
+  }), [clear])
+
   useEffect(() => { initCanvas() }, [initCanvas])
-  // No auto-clear on text change — only the Effacer button clears
 
   function getPos(e) {
     const rect = canvasRef.current.getBoundingClientRect()
@@ -137,4 +147,6 @@ export default function WritingCanvas({ text }) {
       </p>
     </div>
   )
-}
+})
+
+export default WritingCanvas
