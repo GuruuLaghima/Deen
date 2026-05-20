@@ -1,6 +1,7 @@
 import { VOCABULARY, CATEGORIES } from '../data/vocabulary'
 import { ALPHABET } from '../data/alphabet'
 import { LESSONS } from '../data/grammar'
+import { useNotifications } from '../hooks/useNotifications'
 
 function Bar({ value, max, color }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0
@@ -14,10 +15,11 @@ function Bar({ value, max, color }) {
   )
 }
 
-export default function ProgressPage({ learnedWords, learnedLetters, readLessons, quizHistory, streak }) {
+export default function ProgressPage({ learnedWords, learnedLetters, readLessons, quizHistory, streak, isDark, toggleTheme }) {
   const totalScore = quizHistory.reduce((s, q) => s + q.score, 0)
   const totalQ = quizHistory.reduce((s, q) => s + q.total, 0)
   const avgPct = totalQ > 0 ? Math.round((totalScore / totalQ) * 100) : null
+  const { settings, permission, save, requestPermission } = useNotifications()
 
   return (
     <div className="page">
@@ -93,6 +95,59 @@ export default function ProgressPage({ learnedWords, learnedLetters, readLessons
           </div>
         </>
       )}
+
+      <h2 className="section-title">Paramètres</h2>
+      <div className="settings-section">
+
+        <div className="settings-card">
+          <div className="settings-row">
+            <div className="settings-info">
+              <span className="settings-row-title">Mode sombre</span>
+              <span className="settings-row-sub">Réduit la fatigue visuelle</span>
+            </div>
+            <button className={`toggle-btn${isDark ? ' on' : ''}`} onClick={toggleTheme}>
+              {isDark ? '☀ Clair' : '☾ Sombre'}
+            </button>
+          </div>
+        </div>
+
+        <div className="settings-card">
+          <div className="settings-row">
+            <div className="settings-info">
+              <span className="settings-row-title">Rappels quotidiens</span>
+              <span className="settings-row-sub">
+                {permission === 'unsupported' && 'Non supporté sur cet appareil'}
+                {permission === 'denied' && 'Bloqué — autorise dans les réglages'}
+                {permission === 'default' && 'Autorise les notifications pour activer'}
+                {permission === 'granted' && (settings.enabled ? `Rappel à ${settings.time}` : 'Désactivé')}
+              </span>
+            </div>
+            {permission === 'default' && (
+              <button className="toggle-btn" onClick={requestPermission}>Autoriser</button>
+            )}
+            {permission === 'granted' && (
+              <button
+                className={`toggle-btn${settings.enabled ? ' on' : ''}`}
+                onClick={() => save({ ...settings, enabled: !settings.enabled })}
+              >
+                {settings.enabled ? 'Activé' : 'Activer'}
+              </button>
+            )}
+          </div>
+          {permission === 'granted' && settings.enabled && (
+            <div className="settings-row settings-row-sub-row">
+              <span className="settings-row-title">Heure du rappel</span>
+              <input
+                type="time"
+                className="time-input"
+                value={settings.time}
+                onChange={e => save({ ...settings, time: e.target.value })}
+              />
+            </div>
+          )}
+        </div>
+
+      </div>
     </div>
   )
 }

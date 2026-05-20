@@ -1,4 +1,4 @@
-export default function Navbar({ page, setPage }) {
+export default function Navbar({ page, setPage, isDark, toggleTheme }) {
   const tabs = [
     { id: 'home',       label: 'Accueil',   icon: '⌂' },
     { id: 'alphabet',   label: 'Alphabet',  icon: 'أ',  arabic: true },
@@ -21,6 +21,10 @@ export default function Navbar({ page, setPage }) {
           <span className="nav-label">{tab.label}</span>
         </button>
       ))}
+      <button className="nav-theme-btn" onClick={toggleTheme} title={isDark ? 'Mode clair' : 'Mode sombre'}>
+        <span className="nav-icon">{isDark ? '☀' : '☾'}</span>
+        <span className="nav-label nav-theme-label">{isDark ? 'Clair' : 'Sombre'}</span>
+      </button>
     </nav>
   )
 }
