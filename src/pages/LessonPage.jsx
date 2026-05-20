@@ -107,13 +107,13 @@ export default function LessonPage({ lessonId, lessonProgress, saveExerciseDone,
             ))}
           </div>
 
-          {/* Writing canvas — stays mounted to preserve drawing across word switches */}
-          <div style={{ display: activeWord ? 'block' : 'none' }}>
+          {/* Writing canvas — always in DOM so offsetWidth/offsetHeight work on init */}
+          <div className={`lp-writing-outer${activeWord ? '' : ' lp-writing-hidden'}`}>
             <div className="lp-writing-caption">
+              <span className="arabic lp-writing-ar">{activeWord?.ar ?? ''}</span>
               {activeWord && <>
-                <span className="arabic lp-writing-ar">{activeWord.ar}</span>
-                <span className="lp-writing-translit">{activeWord?.translit}</span>
-                <span className="lp-writing-fr">— {activeWord?.fr}</span>
+                <span className="lp-writing-translit">{activeWord.translit}</span>
+                <span className="lp-writing-fr">— {activeWord.fr}</span>
               </>}
             </div>
             <WritingCanvas text={activeWord?.ar ?? ''} />

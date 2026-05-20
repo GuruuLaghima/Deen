@@ -988,6 +988,9 @@ p { line-height: 1.6; }
 .lp-vocab-card.selected .lp-vocab-write-icon { color: var(--green); font-weight: 700; }
 
 /* Writing section inside lesson vocab */
+.lp-writing-outer { /* visible by default */ }
+.lp-writing-hidden { height: 0; overflow: hidden; }
+
 .lp-writing-caption {
   display: flex;
   align-items: baseline;
